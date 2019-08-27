@@ -47,6 +47,7 @@ trait Tables {
     /** Uniqueness Index over (email) (database name email) */
     val index1 = index("email", email, unique=true)
   }
+
   /** Collection-like TableQuery object for table AuthUser */
   lazy val AuthUser = new TableQuery(tag => new AuthUser(tag))
 

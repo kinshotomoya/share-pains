@@ -1,5 +1,8 @@
 package controllers
 
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+
 import javax.inject._
 import play.api.data.{Form, Mapping}
 import play.api.data.Forms._
@@ -7,20 +10,23 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 import play.api.db.slick._
+import play.core.routing.Route
 import service.auth.AuthUserService
 import service.validator.SignupValidator
 import slick.jdbc.{JdbcBackend, JdbcProfile}
 import slick.driver.JdbcProfile
 import tables.Tables._
+import java.time.LocalDateTime
+import java.util.{Calendar, Date}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
 class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
                                   val messagesApi: MessagesApi,
                                   val authService: AuthUserService
-                                 )
+                                 )(implicit ec: ExecutionContext)
   extends Controller with HasDatabaseConfigProvider[JdbcProfile] {
 
   import SignupController._
@@ -39,39 +45,32 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
 
   def signup = Action.async { implicit req =>
     signUpForm.bindFromRequest().fold(
-      formWithError =>
-        BadRequest(views.html.signup(signUpForm)).future,
+      formWithError => {
+        // Future型を返さないといけない
+        // TODO: implicit classで、暗黙的にFuture型を返すメソッドを定義する
+        Future.successful(BadRequest(views.html.signup(formWithError)))
+      },
       data =>
-        authService.emailValidate(data.email) match {
-          case true => {
-            // TODO: ユーザー保存する
+        // flatMapすることで、戻り値のFuture{Option[AuthUser]}のOption[AuthUser]が、flatMapの中で利用できる
+        authService.emailValidate(data.email).flatMap {
+          case None => {
+            val today: Date = Calendar.getInstance.getTime
+            val timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+            val now: String = timeFormat.format(today)
+            val authUser = AuthUserRow(0, data.email, data.password, java.sql.Timestamp.valueOf(now))
+            // TODO:　よーわからん
+            db.run(AuthUser += authUser).map { _ =>
+              Redirect(routes.HomeController.index())
+            }
           }
-          case false => {
+            // すでに存在したら
+          case Some(user) => {
             // サインアップ画面にリダイレクトする
+            Future.successful(BadRequest(views.html.signup(signUpForm)))
           }
         }
     )
   }
-
-//  def signup = Action.async { implicit req =>
-    // signup処理を書く
-
-//    signUpForm.bindFromRequest().fold(
-//      error => {
-//        // バリデーションerrorの場合
-//        println("fail")
-//        println(error.errors)
-//        Redirect(routes.SignupController.rendersignupPage())
-//      },
-//      form => {
-//        // 成功の場合
-//        println("success")
-//        println(form)
-//        // formdataを保存する
-//        Redirect(routes.HomeController.index())
-//      }
-//    )
-//  }
 }
 
 // コンパニオンオブジェクト
