@@ -10,10 +10,10 @@ scalaVersion := "2.11.12"
 libraryDependencies += filters
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.1" % Test
 
-libraryDependencies ++= Seq(
-  "mysql" % "mysql-connector-java" % "6.0.6",
-  "org.flywaydb" %% "flyway-play" % "3.2.0"
-)
+// flyway slickがDB（mysql）と連携するために必要！
+libraryDependencies += "mysql" % "mysql-connector-java" % "6.0.6"
+
+libraryDependencies += "org.flywaydb" %% "flyway-play" % "3.2.0"
 
 libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % "3.2.0",
