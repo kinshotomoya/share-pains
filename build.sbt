@@ -15,6 +15,13 @@ libraryDependencies ++= Seq(
   "org.flywaydb" %% "flyway-play" % "3.2.0"
 )
 
+libraryDependencies ++= Seq(
+  "com.typesafe.slick" %% "slick" % "3.2.0",
+  "com.typesafe.play" %% "play-slick" % "2.1.0",
+  "com.typesafe.slick" %% "slick-codegen" % "3.2.0"
+)
+
+
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
 

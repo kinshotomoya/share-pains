@@ -3,6 +3,9 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
+# slick codegenerator
+GET     /generatetable              controllers.HomeController.generateTable
+
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 

@@ -1,7 +1,6 @@
 package controllers
 
 import javax.inject._
-import play.api._
 import play.api.mvc._
 
 /**
@@ -19,6 +18,13 @@ class HomeController @Inject() extends Controller {
    * a path of `/`.
    */
   def index = Action { implicit request =>
+    Ok(views.html.index())
+  }
+
+  def generateTable = Action { implicit request =>
+    slick.codegen.SourceCodeGenerator.main(
+      Array("slick.jdbc.MySQLProfile", "com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/sharepains?nullNamePatternMatchesAll=true", "./app", "tables", "user", "password")
+    )
     Ok(views.html.index())
   }
 }
