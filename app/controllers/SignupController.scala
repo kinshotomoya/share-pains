@@ -17,9 +17,6 @@ import javax.inject.Inject
 import slick.jdbc.JdbcProfile
 // slickの文法にするimplicitメソッドなどを定義している
 import slick.jdbc.MySQLProfile.api._
-
-
-
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -28,7 +25,7 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
                                   val messagesApi: MessagesApi,
                                   val authService: AuthUserService
                                  )(implicit ec: ExecutionContext)
-  extends Controller with HasDatabaseConfigProvider[JdbcProfile] {
+  extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController {
 
   import SignupController._
 
@@ -49,7 +46,7 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
       formWithError => {
         // Future型を返さないといけない
         // TODO: implicit classで、暗黙的にFuture型を返すメソッドを定義する
-        Future.successful(BadRequest(views.html.signup(formWithError, "適切なemail passwordを入力してください。")))
+        BadRequest(views.html.signup(formWithError, "適切なemail passwordを入力してください。")).future
       },
       data =>
         // flatMapすることで、戻り値のFuture{Option[AuthUser]}のOption[AuthUser]が、flatMapの中で利用できる
@@ -66,7 +63,7 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
             // すでに存在したら
           case true => {
             // サインアップ画面にリダイレクトする
-            Future.successful(BadRequest(views.html.signup(signUpForm, "そのemailはすでに存在しています。")))
+            BadRequest(views.html.signup(signUpForm, "そのemailはすでに存在しています。")).future
           }
         }
     )
