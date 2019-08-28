@@ -49,8 +49,14 @@ class LoginController @Inject() (authUserService: AuthUserService) (implicit ec:
       }
     )
   }
+
+  def logout = Action { implicit req =>
+    req.session.-("userInfo")
+    Redirect(routes.LoginController.renderLoginPage())
+  }
 }
 
+// TODO: 特にコンパニオンオブジェクトにする必要はないので、case classを他のファイルに切り出す
 object LoginController {
   case class LoginForm(email: String, password: String)
 }

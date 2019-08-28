@@ -76,6 +76,7 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
 
 // コンパニオンオブジェクト
 // controllerに定義するのはちゃう物をここに切り出す
+// TODO: 特にコンパニオンオブジェクトにする必要はないので、case classを他のファイルに切り出す
 object SignupController {
   case class SignUpForm(email: String, password: String)
 }
