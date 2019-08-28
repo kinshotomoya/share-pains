@@ -1,6 +1,7 @@
 package service.auth
 
 import javax.inject.Inject
+import org.mindrot.jbcrypt.BCrypt
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 import tables.Tables.{AuthUser, _}
@@ -21,5 +22,10 @@ class AuthUserService @Inject()(
     db.run {
       AuthUser.filter(authUser => authUser.email === email.bind).exists.result
     }
+  }
+
+  def doHashPassword(password: String): String = {
+    // passwordをハッシュ（ソルト・ストレッチング）
+    BCrypt.hashpw(password, BCrypt.gensalt())
   }
 }

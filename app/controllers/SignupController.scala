@@ -55,7 +55,7 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
         // flatMapすることで、戻り値のFuture{Option[AuthUser]}のOption[AuthUser]が、flatMapの中で利用できる
         authService.emailValidate(data.email) flatMap {
           case false => {
-            val user = AuthUserRow(0, data.email, data.password, java.sql.Timestamp.valueOf(getNowTime))
+            val user = AuthUserRow(0, data.email, authService.doHashPassword(data.password), java.sql.Timestamp.valueOf(getNowTime))
             db.run {
               AuthUser += user
             }.map { _ =>
@@ -82,5 +82,4 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
 // controllerに定義するのはちゃう物をここに切り出す
 object SignupController {
   case class SignUpForm(email: String, password: String)
-
 }

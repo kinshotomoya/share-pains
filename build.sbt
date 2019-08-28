@@ -21,6 +21,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick-codegen" % "3.2.0"
 )
 
+libraryDependencies += "org.mindrot" % "jbcrypt" % "0.4"
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
