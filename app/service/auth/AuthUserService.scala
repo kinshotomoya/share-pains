@@ -39,5 +39,4 @@ class AuthUserService @Inject()(
   private def checkPassword(password: String): Boolean = {
     BCrypt.checkpw(password, doHashPassword(password))
   }
-
 }

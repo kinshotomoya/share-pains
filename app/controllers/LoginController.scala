@@ -32,7 +32,9 @@ class LoginController @Inject() (authUserService: AuthUserService) (implicit ec:
     }
   }
 
-  def customLogin = Action.async { implicit req =>
+  def login = Action.async { implicit req =>
+    // sessionを削除
+    req.session.-("userInfo")
     loginForm.bindFromRequest().fold(
       formWithError => {
         // errorの時
@@ -41,7 +43,7 @@ class LoginController @Inject() (authUserService: AuthUserService) (implicit ec:
       data => {
         // デフォルトのバリデーションが通った時
         authUserService.loginValidate(data.email, data.password) flatMap {
-          case true => Redirect(routes.HomeController.index()).future
+          case true => Redirect(routes.HomeController.index()).withSession("userInfo" -> data.email).future
           case false => BadRequest(views.html.login()).future
         }
       }
