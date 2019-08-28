@@ -28,7 +28,7 @@ class LoginController @Inject() (authUserService: AuthUserService) (implicit ec:
     // Optionで返って来るのでmatchで存在するかどうかを確認する
     req.session.get("userInfo") match {
       case Some(session) => Redirect(routes.HomeController.index())
-      case None => Ok(views.html.login())
+      case None => Ok(views.html.login(""))
     }
   }
 
@@ -38,13 +38,13 @@ class LoginController @Inject() (authUserService: AuthUserService) (implicit ec:
     loginForm.bindFromRequest().fold(
       formWithError => {
         // errorの時
-        BadRequest(views.html.login()).future
+        BadRequest(views.html.login("")).future
       },
       data => {
         // デフォルトのバリデーションが通った時
         authUserService.loginValidate(data.email, data.password) flatMap {
           case true => Redirect(routes.HomeController.index()).withSession("userInfo" -> data.email).future
-          case false => BadRequest(views.html.login()).future
+          case false => BadRequest(views.html.login("")).future
         }
       }
     )

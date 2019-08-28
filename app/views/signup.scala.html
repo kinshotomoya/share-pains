@@ -36,7 +36,7 @@
                             </div>
                             <p class="error-message">@message</p>
                             @* TODO: login urlを実装 *@
-                            <a th:href="#"><p class="login-text">ログインはこちら</p></a>
+                            <a href="@routes.LoginController.renderLoginPage()"><p class="login-text">ログインはこちら</p></a>
                         }
                     </div>
                 </div>

@@ -14,19 +14,20 @@
                 <div class="col-md-4 mx-auto">
                     <div class="form-container myform form">
 @*                        TODO: @form()でLoginControllerに処理が飛ぶように設定する *@
-                        @form(routes.SignupController.signup()) {
+                        @form(routes.LoginController.login()) {
+                            @CSRF.formField
                             <div class="form-group">
-                                <input class="form-control my-input" name="email" id="login_form_email" placeholder="email">
+                                <input class="form-control my-input" name="email" id="login_form_email" placeholder="email" type="email">
                             </div>
                             <div class="form-group">
-                                <input class="form-control my-input" name="password" id="login_form_password" placeholder="password">
+                                <input class="form-control my-input" name="password" id="login_form_password" placeholder="password" type="password">
                             </div>
-                            <p th:text="${errorMessage}" class="error-message"></p>
                             <div class="text-center ">
                                 <button type="submit" class=" btn btn-block send-button tx-tfm btn-primary" id="login_form_submit">ログイン</button>
                             </div>
                             <p>@message</p>
-                            <a href="#"><p class="signup-text">サインアップはこちら</p></a>
+                            <a href="@routes.SignupController.rendersignupPage()"><p class="signup-text">サインアップはこちら</p></a>
+                        }
                     </div>
                 </div>
             </div>
