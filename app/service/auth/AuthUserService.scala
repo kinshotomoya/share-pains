@@ -28,4 +28,16 @@ class AuthUserService @Inject()(
     // passwordをハッシュ（ソルト・ストレッチング）
     BCrypt.hashpw(password, BCrypt.gensalt())
   }
+
+  def loginValidate(email: String, password: String): Future[Boolean] = {
+    this.emailValidate(email) flatMap {
+      case true => Future { checkPassword(password) }
+      case false => Future { false }
+    }
+  }
+
+  private def checkPassword(password: String): Boolean = {
+    BCrypt.checkpw(password, doHashPassword(password))
+  }
+
 }

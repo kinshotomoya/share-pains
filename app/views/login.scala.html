@@ -1,6 +1,6 @@
-@()
+@(message: String)(implicit request: Request[Any])
 @import helper._
-@main("signup") {
+@main("login") {
     <body>
         <div class="container">
             <div class="col-md-6 mx-auto text-center">
@@ -13,7 +13,6 @@
             <div class="row">
                 <div class="col-md-4 mx-auto">
                     <div class="form-container myform form">
-                        <form id="login_form" action="#" method="post">
                             <div class="form-group">
                                 <input class="form-control my-input" name="email" id="login_form_email" placeholder="email">
                             </div>
@@ -24,8 +23,8 @@
                             <div class="text-center ">
                                 <button type="submit" class=" btn btn-block send-button tx-tfm btn-primary" id="login_form_submit">ログイン</button>
                             </div>
+                            <p>@message</p>
                             <a href="#"><p class="signup-text">サインアップはこちら</p></a>
-                        </form>
                     </div>
                 </div>
             </div>
