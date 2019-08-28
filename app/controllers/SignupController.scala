@@ -4,20 +4,21 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
 import javax.inject._
-import play.api.data.{Form, Mapping}
-import play.api.data.Forms._
+import play.api.data.Form
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import play.api.i18n.MessagesApi
-import play.api.mvc._
-import play.api.db.slick._
-import play.core.routing.Route
 import service.auth.AuthUserService
-import service.validator.SignupValidator
-import slick.jdbc.{JdbcBackend, JdbcProfile}
-import slick.driver.JdbcProfile
 import tables.Tables._
-import java.time.LocalDateTime
 import java.util.{Calendar, Date}
+
+import play.api.mvc._
+import play.api.data.Forms._
+import play.api.i18n.MessagesApi
+import javax.inject.Inject
+import slick.jdbc.JdbcProfile
+// slickの文法にするimplicitメソッドなどを定義している
+import slick.jdbc.MySQLProfile.api._
+
+
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -52,24 +53,28 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
       },
       data =>
         // flatMapすることで、戻り値のFuture{Option[AuthUser]}のOption[AuthUser]が、flatMapの中で利用できる
-        authService.emailValidate(data.email).flatMap {
-          case None => {
-            val today: Date = Calendar.getInstance.getTime
-            val timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-            val now: String = timeFormat.format(today)
-            val authUser = AuthUserRow(0, data.email, data.password, java.sql.Timestamp.valueOf(now))
-            // TODO:　よーわからん
-            db.run(AuthUser += authUser).map { _ =>
+        authService.emailValidate(data.email) flatMap {
+          case false => {
+            val user = AuthUserRow(0, data.email, data.password, java.sql.Timestamp.valueOf(getNowTime))
+            db.run {
+              AuthUser += user
+            }.map { _ =>
               Redirect(routes.HomeController.index())
             }
           }
             // すでに存在したら
-          case Some(user) => {
+          case true => {
             // サインアップ画面にリダイレクトする
             Future.successful(BadRequest(views.html.signup(signUpForm)))
           }
         }
     )
+  }
+
+  private def getNowTime: String = {
+    val today: Date = Calendar.getInstance.getTime
+    val timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    timeFormat.format(today)
   }
 }
 
