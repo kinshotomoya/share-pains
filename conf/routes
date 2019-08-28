@@ -15,3 +15,5 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 GET /signup  controllers.SignupController.rendersignupPage
 POST /signup  controllers.SignupController.signup
+
+GET /login  controllers.LoginController.renderLoginPage

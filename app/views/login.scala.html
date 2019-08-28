@@ -1,0 +1,34 @@
+@()
+@import helper._
+@main("signup") {
+    <body>
+        <div class="container">
+            <div class="col-md-6 mx-auto text-center">
+                <div class="header-title">
+                    <h1 class="wv-heading--title">
+                        ログイン
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mx-auto">
+                    <div class="form-container myform form">
+                        <form id="login_form" action="#" method="post">
+                            <div class="form-group">
+                                <input class="form-control my-input" name="email" id="login_form_email" placeholder="email">
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control my-input" name="password" id="login_form_password" placeholder="password">
+                            </div>
+                            <p th:text="${errorMessage}" class="error-message"></p>
+                            <div class="text-center ">
+                                <button type="submit" class=" btn btn-block send-button tx-tfm btn-primary" id="login_form_submit">ログイン</button>
+                            </div>
+                            <a href="#"><p class="signup-text">サインアップはこちら</p></a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+}

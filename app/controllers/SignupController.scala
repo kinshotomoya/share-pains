@@ -1,6 +1,5 @@
 package controllers
 
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
 import javax.inject._
@@ -52,12 +51,11 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
         // flatMapすることで、戻り値のFuture{Option[AuthUser]}のOption[AuthUser]が、flatMapの中で利用できる
         authService.emailValidate(data.email) flatMap {
           case false => {
-            // TODO: とりあえず、AuthUserIDをセッションに格納している。
+            // TODO: とりあえず、AuthUserのemailをセッションに格納している。
+            // createしたauthUserのIDを取得したい
             val user = AuthUserRow(0, data.email, authService.doHashPassword(data.password), java.sql.Timestamp.valueOf(getNowTime))
-            db.run {
-              AuthUser += user
-            }.map { _ =>
-              Redirect(routes.HomeController.index()).withSession("userInfo" -> user.authUserId.toString)
+            db.run(AuthUser += user).map { _ =>
+              Redirect(routes.HomeController.index()).withSession("userInfo" -> user.email)
             }
           }
             // すでに存在したら
