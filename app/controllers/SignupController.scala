@@ -41,7 +41,7 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
   )
 
   def rendersignupPage = Action { implicit req =>
-    Ok(views.html.signup(signUpForm))
+    Ok(views.html.signup(signUpForm, ""))
   }
 
   def signup = Action.async { implicit req =>
@@ -49,23 +49,24 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
       formWithError => {
         // Future型を返さないといけない
         // TODO: implicit classで、暗黙的にFuture型を返すメソッドを定義する
-        Future.successful(BadRequest(views.html.signup(formWithError)))
+        Future.successful(BadRequest(views.html.signup(formWithError, "適切なemail passwordを入力してください。")))
       },
       data =>
         // flatMapすることで、戻り値のFuture{Option[AuthUser]}のOption[AuthUser]が、flatMapの中で利用できる
         authService.emailValidate(data.email) flatMap {
           case false => {
+            // TODO: とりあえず、AuthUserIDをセッションに格納している。
             val user = AuthUserRow(0, data.email, authService.doHashPassword(data.password), java.sql.Timestamp.valueOf(getNowTime))
             db.run {
               AuthUser += user
             }.map { _ =>
-              Redirect(routes.HomeController.index())
+              Redirect(routes.HomeController.index()).withSession("userInfo" -> user.authUserId.toString)
             }
           }
             // すでに存在したら
           case true => {
             // サインアップ画面にリダイレクトする
-            Future.successful(BadRequest(views.html.signup(signUpForm)))
+            Future.successful(BadRequest(views.html.signup(signUpForm, "そのemailはすでに存在しています。")))
           }
         }
     )

@@ -1,4 +1,4 @@
-@(signupForm: Form[controllers.SignupController.SignUpForm])(implicit request: Request[Any])
+@(signupForm: Form[controllers.SignupController.SignUpForm], message: String)(implicit request: Request[Any])
 @import helper._
 @main("signup") {
     <body id="signup">
@@ -34,7 +34,8 @@
                             <div class="text-center ">
                                 <button type="submit" class=" btn btn-block send-button tx-tfm btn-primary" id="signup_form_submit">サインアップ</button>
                             </div>
-                            @*                            TODO: login urlを実装 *@
+                            <p class="error-message">@message</p>
+                            @* TODO: login urlを実装 *@
                             <a th:href="#"><p class="login-text">ログインはこちら</p></a>
                         }
                     </div>
