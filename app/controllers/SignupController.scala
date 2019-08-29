@@ -1,22 +1,17 @@
 package controllers
 
-import java.text.SimpleDateFormat
-
 import javax.inject._
 import play.api.data.Form
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import service.auth.AuthUserService
-import tables.Tables._
-import java.util.{Calendar, Date}
 
 import play.api.mvc._
 import play.api.data.Forms._
 import play.api.i18n.MessagesApi
 import javax.inject.Inject
 import slick.jdbc.{JdbcProfile, MySQLProfile}
+import service.auth.models.AuthData
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 // slickの文法にするimplicitメソッドなどを定義している
 import slick.jdbc.MySQLProfile.api._
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,25 +24,25 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
                                  )(implicit ec: ExecutionContext)
   extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController {
 
-  import SignupController._
+//  import SignupController._
 
   val signUpForm = Form(
     mapping(
       // 電子メールの正規表現を使用する
       "email" -> email,
       "password" -> nonEmptyText(maxLength = 20, minLength = 10)
-    )(SignUpForm.apply)(SignUpForm.unapply)
+    )(AuthData.apply)(AuthData.unapply)
   )
 
   def rendersignupPage = Action { implicit req =>
-    Ok(views.html.signup(signUpForm, ""))
+    Ok(views.html.signup(""))
   }
 
   def signup = Action.async { implicit req =>
     signUpForm.bindFromRequest().fold(
       formWithError => {
         // Future型を返さないといけない
-        BadRequest(views.html.signup(formWithError, "適切なemail passwordを入力してください。")).future
+        BadRequest(views.html.signup("適切なemail passwordを入力してください。")).future
       },
       data =>
         // mapすることで、戻り値のFuture{Option[AuthUser]}のOption[AuthUser]が、mapの中で利用できる
@@ -60,7 +55,7 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
             // すでに存在したら
           case Some(authUser) => {
             // サインアップ画面にリダイレクトする
-            BadRequest(views.html.signup(signUpForm, "そのemailはすでに存在しています。"))
+            BadRequest(views.html.signup("そのemailはすでに存在しています。"))
           }
         }
     )
@@ -70,6 +65,6 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
 // コンパニオンオブジェクト
 // controllerに定義するのはちゃう物をここに切り出す
 // TODO: 特にコンパニオンオブジェクトにする必要はないので、case classを他のファイルに切り出す
-object SignupController {
-  case class SignUpForm(email: String, password: String)
-}
+//object SignupController {
+//  case class SignUpForm(email: String, password: String)
+//}

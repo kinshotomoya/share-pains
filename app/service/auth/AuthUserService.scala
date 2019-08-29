@@ -3,10 +3,10 @@ package service.auth
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date}
 
-import controllers.SignupController.SignUpForm
 import javax.inject.Inject
 import org.mindrot.jbcrypt.BCrypt
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import service.auth.models.AuthData
 import slick.jdbc.JdbcProfile
 import tables.Tables.{AuthUser, _}
 import slick.jdbc.MySQLProfile.api._
@@ -30,7 +30,7 @@ class AuthUserService @Inject()(
     result
   }
 
-  def createAuthUser(data: SignUpForm): Future[Int] = {
+  def createAuthUser(data: AuthData): Future[Int] = {
     val user = AuthUserRow(0, data.email, doHashPassword(data.password), java.sql.Timestamp.valueOf(getNowTime))
     // returningで、戻り値を指定できる
     // createしたauthUserのIDを指定ている

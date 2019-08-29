@@ -1,6 +1,5 @@
 package controllers
 
-import controllers.SignupController.SignUpForm
 import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.data.Forms._
