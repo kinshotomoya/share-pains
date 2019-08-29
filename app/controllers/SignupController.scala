@@ -24,8 +24,6 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
                                  )(implicit ec: ExecutionContext)
   extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController {
 
-//  import SignupController._
-
   val signUpForm = Form(
     mapping(
       // 電子メールの正規表現を使用する
@@ -61,10 +59,3 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
     )
   }
 }
-
-// コンパニオンオブジェクト
-// controllerに定義するのはちゃう物をここに切り出す
-// TODO: 特にコンパニオンオブジェクトにする必要はないので、case classを他のファイルに切り出す
-//object SignupController {
-//  case class SignUpForm(email: String, password: String)
-//}
