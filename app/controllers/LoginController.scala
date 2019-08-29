@@ -2,15 +2,15 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 import play.api.data.Form
-import play.api.data.Forms._
-import play.api.data.Forms.{mapping, nonEmptyText}
+import play.api.data.Forms.{mapping, nonEmptyText, uuid, _}
 import play.api.mvc.{Action, Controller}
 import service.auth.AuthUserService
+import service.member.MemberService
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class LoginController @Inject() (authUserService: AuthUserService) (implicit ec: ExecutionContext) extends Controller with BaseController {
+class LoginController @Inject() (authUserService: AuthUserService, memberService: MemberService) (implicit ec: ExecutionContext) extends Controller with BaseController {
 
   import LoginController._
 
@@ -23,7 +23,7 @@ class LoginController @Inject() (authUserService: AuthUserService) (implicit ec:
 
   def renderLoginPage = Action { implicit req =>
     // sessionがあったら、index ページに飛ばす
-    // なければ、logninページに飛ばす
+    // なければ、loginページに飛ばす
     // Optionで返って来るのでmatchで存在するかどうかを確認する
     req.session.get("userInfo") match {
       case Some(session) => Redirect(routes.HomeController.index())
@@ -44,7 +44,13 @@ class LoginController @Inject() (authUserService: AuthUserService) (implicit ec:
         // Future[Boolean]
         // Future flatMapの時は、Futureは潰される。なので、Future[Boolean].flatMapの戻り値は、Booleanになる。
         authUserService.loginValidate(data.email, data.password) map {
-          case true => Redirect(routes.HomeController.index()).withSession("userInfo" -> data.email)
+          case true => {
+            // emailからauthuserに紐づいているmemberのuuidを取得する
+//            val futureUUID: Future[String] = memberService.findUUIDByAuthUserEmail(data.email)
+            val uuid = authUserService.createUuid
+            memberService.findUUIDByAuthUserEmailAndUpdateUUID(data.email, uuid)
+            Redirect(routes.HomeController.index()).withSession("userInfo" -> uuid)
+          }
           case false => BadRequest(views.html.login(""))
         }
       }
