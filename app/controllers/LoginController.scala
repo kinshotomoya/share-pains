@@ -42,7 +42,6 @@ class LoginController @Inject() (authUserService: AuthUserService) (implicit ec:
       },
       data => {
         // デフォルトのバリデーションが通った時
-        // mapを使うべきだが、.future implicitクラスを使ってみたかったので、flatMapにしている
         // Future[Boolean]
         // Future flatMapの時は、Futureは潰される。なので、Future[Boolean].flatMapの戻り値は、Booleanになる。
         authUserService.loginValidate(data.email, data.password) map {

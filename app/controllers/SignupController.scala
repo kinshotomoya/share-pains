@@ -14,6 +14,9 @@ import play.api.data.Forms._
 import play.api.i18n.MessagesApi
 import javax.inject.Inject
 import slick.jdbc.{JdbcProfile, MySQLProfile}
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 // slickの文法にするimplicitメソッドなどを定義している
 import slick.jdbc.MySQLProfile.api._
 import scala.concurrent.{ExecutionContext, Future}
@@ -51,8 +54,8 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
         // flatMapを使う必要はない。flatMapはmap flattenをしているだけで、複数の中身を潰して平らにしたいとkに
         authService.findByEmail(data.email) map {
           case None => {
-            val authUserId: Future[Int] = authService.createAuthUser(data)
-            Redirect(routes.HomeController.index()).withSession("userInfo" -> authUserId.toString)
+            authService.createAuthUser(data)
+            Redirect(routes.HomeController.index()).withSession("userInfo" -> data.email)
           }
             // すでに存在したら
           case Some(authUser) => {
