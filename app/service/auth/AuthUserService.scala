@@ -38,13 +38,8 @@ class AuthUserService @Inject()(
         authUserId: Int <- AuthUser returning AuthUser.map(_.authUserId) += user
         _ <- Member += MemberRow(0,  data.nickname, uuid, authUserId, getNowTimeStamp, getNowTimeStamp)
       } yield ()).transactionally
-    // TODO: memberも作成する
-    // uuidを作る
-    // transaction
-//    val user = AuthUserRow(0, data.email, doHashPassword(data.password), java.sql.Timestamp.valueOf(getNowTimeStamp))
     // returningで、戻り値を指定できる
     // createしたauthUserのIDを指定ている
-//    val action: DBIO[Int] = AuthUser returning AuthUser.map(_.authUserId) += user
     db.run(action)
   }
 
