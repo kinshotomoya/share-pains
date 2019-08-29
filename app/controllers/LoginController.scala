@@ -42,9 +42,12 @@ class LoginController @Inject() (authUserService: AuthUserService) (implicit ec:
       },
       data => {
         // デフォルトのバリデーションが通った時
-        authUserService.loginValidate(data.email, data.password) flatMap {
-          case true => Redirect(routes.HomeController.index()).withSession("userInfo" -> data.email).future
-          case false => BadRequest(views.html.login("")).future
+        // mapを使うべきだが、.future implicitクラスを使ってみたかったので、flatMapにしている
+        // Future[Boolean]
+        // Future flatMapの時は、Futureは潰される。なので、Future[Boolean].flatMapの戻り値は、Booleanになる。
+        authUserService.loginValidate(data.email, data.password) map {
+          case true => Redirect(routes.HomeController.index()).withSession("userInfo" -> data.email)
+          case false => BadRequest(views.html.login(""))
         }
       }
     )
