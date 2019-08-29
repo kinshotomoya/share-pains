@@ -1,12 +1,13 @@
 package service.auth
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date}
 
 import javax.inject.Inject
 import org.mindrot.jbcrypt.BCrypt
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import service.auth.models.AuthData
+import service.auth.models.SignUpForm
 import slick.jdbc.JdbcProfile
 import tables.Tables.{AuthUser, _}
 import slick.jdbc.MySQLProfile.api._
@@ -30,12 +31,25 @@ class AuthUserService @Inject()(
     result
   }
 
-  def createAuthUser(data: AuthData): Future[Int] = {
-    val user = AuthUserRow(0, data.email, doHashPassword(data.password), java.sql.Timestamp.valueOf(getNowTime))
+  def createAuthUser(data: SignUpForm, uuid: String): Future[Unit] = {
+    val user = AuthUserRow(0, data.email, doHashPassword(data.password), getNowTimeStamp)
+    val action =  (
+      for {
+        authUserId: Int <- AuthUser returning AuthUser.map(_.authUserId) += user
+        _ <- Member += MemberRow(0,  data.nickname, uuid, authUserId, getNowTimeStamp, getNowTimeStamp)
+      } yield ()).transactionally
+    // TODO: memberも作成する
+    // uuidを作る
+    // transaction
+//    val user = AuthUserRow(0, data.email, doHashPassword(data.password), java.sql.Timestamp.valueOf(getNowTimeStamp))
     // returningで、戻り値を指定できる
     // createしたauthUserのIDを指定ている
-    val action: DBIO[Int] = AuthUser returning AuthUser.map(_.authUserId) += user
+//    val action: DBIO[Int] = AuthUser returning AuthUser.map(_.authUserId) += user
     db.run(action)
+  }
+
+  def createUuid: String = {
+    java.util.UUID.randomUUID().toString
   }
 
   def loginValidate(email: String, password: String): Future[Boolean] = {
@@ -54,9 +68,9 @@ class AuthUserService @Inject()(
     BCrypt.checkpw(password, doHashPassword(password))
   }
 
-  private def getNowTime: String = {
+  private def getNowTimeStamp: Timestamp = {
     val today: Date = Calendar.getInstance.getTime
     val timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-    timeFormat.format(today)
+    java.sql.Timestamp.valueOf(timeFormat.format(today))
   }
 }

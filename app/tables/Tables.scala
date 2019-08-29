@@ -14,7 +14,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = AuthUser.schema ++ SchemaVersion.schema
+  lazy val schema: profile.SchemaDescription = AuthUser.schema ++ Member.schema ++ Post.schema ++ SchemaVersion.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -47,9 +47,78 @@ trait Tables {
     /** Uniqueness Index over (email) (database name email) */
     val index1 = index("email", email, unique=true)
   }
-
   /** Collection-like TableQuery object for table AuthUser */
   lazy val AuthUser = new TableQuery(tag => new AuthUser(tag))
+
+  /** Entity class storing rows of table Member
+   *  @param memberId Database column member_id SqlType(INT), AutoInc, PrimaryKey
+   *  @param nickname Database column nickname SqlType(VARCHAR), Length(45,true)
+   *  @param uuid Database column uuid SqlType(VARCHAR), Length(55,true)
+   *  @param authUserId Database column auth_user_id SqlType(INT)
+   *  @param createdAt Database column created_at SqlType(DATETIME)
+   *  @param updatedAt Database column updated_at SqlType(DATETIME) */
+  final case class MemberRow(memberId: Int, nickname: String, uuid: String, authUserId: Int, createdAt: java.sql.Timestamp, updatedAt: java.sql.Timestamp)
+  /** GetResult implicit for fetching MemberRow objects using plain SQL queries */
+  implicit def GetResultMemberRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[MemberRow] = GR{
+    prs => import prs._
+    MemberRow.tupled((<<[Int], <<[String], <<[String], <<[Int], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
+  }
+  /** Table description of table member. Objects of this class serve as prototypes for rows in queries. */
+  class Member(_tableTag: Tag) extends profile.api.Table[MemberRow](_tableTag, Some("sharepains"), "member") {
+    def * = (memberId, nickname, uuid, authUserId, createdAt, updatedAt) <> (MemberRow.tupled, MemberRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(memberId), Rep.Some(nickname), Rep.Some(uuid), Rep.Some(authUserId), Rep.Some(createdAt), Rep.Some(updatedAt)).shaped.<>({r=>import r._; _1.map(_=> MemberRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column member_id SqlType(INT), AutoInc, PrimaryKey */
+    val memberId: Rep[Int] = column[Int]("member_id", O.AutoInc, O.PrimaryKey)
+    /** Database column nickname SqlType(VARCHAR), Length(45,true) */
+    val nickname: Rep[String] = column[String]("nickname", O.Length(45,varying=true))
+    /** Database column uuid SqlType(VARCHAR), Length(55,true) */
+    val uuid: Rep[String] = column[String]("uuid", O.Length(55,varying=true))
+    /** Database column auth_user_id SqlType(INT) */
+    val authUserId: Rep[Int] = column[Int]("auth_user_id")
+    /** Database column created_at SqlType(DATETIME) */
+    val createdAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created_at")
+    /** Database column updated_at SqlType(DATETIME) */
+    val updatedAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("updated_at")
+
+    /** Foreign key referencing AuthUser (database name member_ibfk_1) */
+    lazy val authUserFk = foreignKey("member_ibfk_1", authUserId, AuthUser)(r => r.authUserId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+  }
+  /** Collection-like TableQuery object for table Member */
+  lazy val Member = new TableQuery(tag => new Member(tag))
+
+  /** Entity class storing rows of table Post
+   *  @param postId Database column post_id SqlType(BIGINT), AutoInc, PrimaryKey
+   *  @param content Database column content SqlType(VARCHAR), Length(1024,true)
+   *  @param createdAt Database column created_at SqlType(DATETIME)
+   *  @param memberId Database column member_id SqlType(INT) */
+  final case class PostRow(postId: Long, content: String, createdAt: java.sql.Timestamp, memberId: Int)
+  /** GetResult implicit for fetching PostRow objects using plain SQL queries */
+  implicit def GetResultPostRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp], e3: GR[Int]): GR[PostRow] = GR{
+    prs => import prs._
+    PostRow.tupled((<<[Long], <<[String], <<[java.sql.Timestamp], <<[Int]))
+  }
+  /** Table description of table post. Objects of this class serve as prototypes for rows in queries. */
+  class Post(_tableTag: Tag) extends profile.api.Table[PostRow](_tableTag, Some("sharepains"), "post") {
+    def * = (postId, content, createdAt, memberId) <> (PostRow.tupled, PostRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(postId), Rep.Some(content), Rep.Some(createdAt), Rep.Some(memberId)).shaped.<>({r=>import r._; _1.map(_=> PostRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column post_id SqlType(BIGINT), AutoInc, PrimaryKey */
+    val postId: Rep[Long] = column[Long]("post_id", O.AutoInc, O.PrimaryKey)
+    /** Database column content SqlType(VARCHAR), Length(1024,true) */
+    val content: Rep[String] = column[String]("content", O.Length(1024,varying=true))
+    /** Database column created_at SqlType(DATETIME) */
+    val createdAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created_at")
+    /** Database column member_id SqlType(INT) */
+    val memberId: Rep[Int] = column[Int]("member_id")
+
+    /** Foreign key referencing Member (database name post_ibfk_1) */
+    lazy val memberFk = foreignKey("post_ibfk_1", memberId, Member)(r => r.memberId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+  }
+  /** Collection-like TableQuery object for table Post */
+  lazy val Post = new TableQuery(tag => new Post(tag))
 
   /** Entity class storing rows of table SchemaVersion
    *  @param installedRank Database column installed_rank SqlType(INT), PrimaryKey

@@ -10,7 +10,7 @@ import play.api.data.Forms._
 import play.api.i18n.MessagesApi
 import javax.inject.Inject
 import slick.jdbc.{JdbcProfile, MySQLProfile}
-import service.auth.models.AuthData
+import service.auth.models.SignUpForm
 
 // slickの文法にするimplicitメソッドなどを定義している
 import slick.jdbc.MySQLProfile.api._
@@ -27,9 +27,10 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
   val signUpForm = Form(
     mapping(
       // 電子メールの正規表現を使用する
+      "nickname" -> nonEmptyText,
       "email" -> email,
       "password" -> nonEmptyText(maxLength = 20, minLength = 10)
-    )(AuthData.apply)(AuthData.unapply)
+    )(SignUpForm.apply)(SignUpForm.unapply)
   )
 
   def rendersignupPage = Action { implicit req =>
@@ -47,8 +48,9 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
         // flatMapを使う必要はない。flatMapはmap flattenをしているだけで、複数の中身を潰して平らにしたいとkに
         authService.findByEmail(data.email) map {
           case None => {
-            authService.createAuthUser(data)
-            Redirect(routes.HomeController.index()).withSession("userInfo" -> data.email)
+            val uuid: String = authService.createUuid
+            authService.createAuthUser(data, uuid)
+            Redirect(routes.HomeController.index()).withSession("userInfo" -> uuid)
           }
             // すでに存在したら
           case Some(authUser) => {
