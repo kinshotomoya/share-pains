@@ -3,5 +3,9 @@
 @import helper._
 
 @main("Welcome to Play") {
-  <h1>Welcome to Play!</h1>
+  <div>
+    @posts.map { post =>
+      <p>@post.content</p>
+    }
+  </div>
 }

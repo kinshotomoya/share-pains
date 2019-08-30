@@ -1,8 +1,5 @@
 package controllers
 
-import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
 
 import javax.inject.Inject
 import play.api.data.Form
@@ -11,8 +8,6 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.mvc._
 import slick.jdbc.JdbcProfile
 import service.post.{PostForm, PostService}
-import tables.Tables._
-import slick.jdbc.MySQLProfile.api._
 
 import scala.concurrent.ExecutionContext
 
@@ -24,16 +19,24 @@ class PostController @Inject() (postService: PostService) (val dbConfigProvider:
     )(PostForm.apply)(PostForm.unapply)
   )
 
+  def renderPostPage = Action { implicit req =>
+    req.session.get("userInfo") match {
+      case Some(uuid) => Ok(views.html.post(""))
+      case None =>  Redirect(routes.LoginController.renderLoginPage())
+    }
+  }
+
   def post = Action.async { implicit req =>
     postForm.bindFromRequest().fold(
       formWithError => {
-        BadRequest().future
+        BadRequest(views.html.post("")).future
       },
       data => {
-        val uuid: String = req.session.get("userInfo").getOrElse(Redirect(routes.LoginController.renderLoginPage()).future)
+        // TODO: sessionがないときにエラー起きるので、getOrElseなどで条件分けて回避したい
+        val uuid: String = req.session.get("userInfo").get
         postService.create(data, uuid).map {
-          case true => Redirect(routes.LoginController.renderLoginPage())
-          case false => BadRequest()
+          case true => Redirect(routes.HomeController.index())
+          case false => BadRequest(views.html.post(""))
         }
       }
     )

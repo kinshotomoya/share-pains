@@ -20,10 +20,11 @@ class PostService @Inject()(
   def create(data: PostForm, uuid: String): Future[Boolean] = {
     db.run(Member.filter(_.uuid === uuid).result.headOption).flatMap {
       case Some(member) => {
-        Post += PostRow(0L, data.content, getNowTimeStamp, member.memberId)
-          Future { true }
+        println(member.memberId)
+        db.run(Post += PostRow(0L, data.content, getNowTimeStamp, member.memberId))
+        Future { true }
       }
-      case None => Future { true }
+      case None => Future { false }
     }
   }
 
