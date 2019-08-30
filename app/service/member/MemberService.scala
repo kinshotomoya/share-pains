@@ -12,7 +12,6 @@ import tables.Tables._
 import slick.jdbc.MySQLProfile.api._
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Success, Try}
 
 class MemberService @Inject()(
                                val dbConfigProvider: DatabaseConfigProvider
