@@ -6,6 +6,7 @@ import java.util.{Calendar, Date}
 
 import javax.inject.Inject
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import service.post.models.{DisplayPostContent, PostForm}
 import slick.jdbc.JdbcProfile
 import slick.jdbc.MySQLProfile.api._
 import tables.Tables._
@@ -29,6 +30,12 @@ class PostService @Inject()(
       case None => Future {
         false
       }
+    }
+  }
+
+  def tupleDisplayContent(posts: Seq[(PostRow, MemberRow)]): Seq[DisplayPostContent] = {
+    posts.map { post =>
+      DisplayPostContent(post._1.content, post._2.nickname, post._1.postId)
     }
   }
 

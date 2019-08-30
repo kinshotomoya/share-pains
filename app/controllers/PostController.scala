@@ -6,7 +6,8 @@ import play.api.data.Form
 import play.api.data.Forms.{mapping, nonEmptyText}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.mvc._
-import service.post.{PostForm, PostService}
+import service.post.PostService
+import service.post.models.PostForm
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext

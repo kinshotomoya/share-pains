@@ -15,11 +15,10 @@ import scala.concurrent.ExecutionContext
 
 
 @Singleton
-class SignupController @Inject()(val dbConfigProvider: DatabaseConfigProvider,
-                                 val messagesApi: MessagesApi,
+class SignupController @Inject()(val messagesApi: MessagesApi,
                                  val authService: AuthUserService
                                 )(implicit ec: ExecutionContext)
-  extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController {
+  extends Controller with BaseController {
 
   val signUpForm = Form(
     mapping(
