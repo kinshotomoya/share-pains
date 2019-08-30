@@ -1,6 +1,9 @@
 @(message: String)(implicit request: Request[Any])
 @import helper._
 @main("login") {
+    <head>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/signup.css")">
+    </head>
     <body>
         <div class="container">
             <div class="col-md-6 mx-auto text-center">

@@ -1,27 +1,24 @@
 package controllers
 
-import javax.inject._
+import javax.inject.{Inject, _}
 import play.api.data.Form
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import service.auth.AuthUserService
-
-import play.api.mvc._
 import play.api.data.Forms._
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.i18n.MessagesApi
-import javax.inject.Inject
-import slick.jdbc.{JdbcProfile, MySQLProfile}
+import play.api.mvc._
+import service.auth.AuthUserService
 import service.auth.models.SignUpForm
+import slick.jdbc.JdbcProfile
 
 // slickの文法にするimplicitメソッドなどを定義している
-import slick.jdbc.MySQLProfile.api._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 
 @Singleton
-class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
-                                  val messagesApi: MessagesApi,
-                                  val authService: AuthUserService
-                                 )(implicit ec: ExecutionContext)
+class SignupController @Inject()(val dbConfigProvider: DatabaseConfigProvider,
+                                 val messagesApi: MessagesApi,
+                                 val authService: AuthUserService
+                                )(implicit ec: ExecutionContext)
   extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController {
 
   val signUpForm = Form(
@@ -52,7 +49,7 @@ class SignupController @Inject() (val dbConfigProvider: DatabaseConfigProvider,
             authService.createAuthUser(data, uuid)
             Redirect(routes.HomeController.index()).withSession("userInfo" -> uuid)
           }
-            // すでに存在したら
+          // すでに存在したら
           case Some(authUser) => {
             // サインアップ画面にリダイレクトする
             BadRequest(views.html.signup("そのemailはすでに存在しています。"))

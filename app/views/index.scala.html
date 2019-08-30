@@ -3,9 +3,106 @@
 @import helper._
 
 @main("Welcome to Play") {
-  <div>
-    @posts.map { post =>
-      <p>@post.content</p>
-    }
-  </div>
+    <head>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/index.css")">
+    </head>
+    <body id="top">
+        <div class="wrapper">
+            <nav id="content-name-header" class="navbar navbar-light bg-light">
+                <h4>HOME</h4>
+            </nav>
+            <nav id="sidebar" class="sidebar-left">
+                <div class="sidebar-header">
+                    <a href='/' id="logo_link logo" class="navbar-brand">
+                        <h3 id="logo_link">SHARE PAINS</h3>
+                    </a>
+                </div>
+                <ul class="list-unstyled components">
+                    <li class="active">
+                        <a id="home" class="nav-link" href="@routes.HomeController.index()">
+                            HOME
+                        </a>
+                    </li>
+                    <li>
+                        <a id="mypage_icon" class="nav-link" href="#">
+                            プロフィール
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@routes.PostController.renderPostPage()" id="create_post_button" class="nav-link">
+                            投稿する
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div id="contents-wrapper">
+                <div class="content-display-area">
+                    @posts.map { post =>
+                        <div>
+                            <div class="card card-body">
+                                <h5 class="card-title">
+                                    <a th:href="#">
+                                        <span id="member_name">
+                                            @post.memberId
+                                        </span>
+                                    </a>
+                                </h5>
+                                <p class="card-text">
+                                    @post.content
+                                </p>
+@*                                tag*@
+@*                                <div id="content_tag_wrapper">*@
+@*                                    <span th:each="tag : ${postTagMap.get(post)}">*@
+@*                                        <form th:action="@{/search}" method="get" id="tag-search_form">*@
+@*                                            <input th:type="hidden" id="search_box" class="form-control" name="search_tag" type="text" placeholder="Search" aria-label="Search" th:value="${tag.getName()}">*@
+@*                                        </form>*@
+@*                                        <a th:href="@{#}"><span id="content_tag" class="content_tag" th:text="${tag.getName()}"></span></a>*@
+@*                                    </span>*@
+@*                                </div>*@
+                                <div id="cheer-button" class="btn btn-primary">
+                                    <form th:action="#" method="post">
+                                        <input type="hidden" value="@post.postId" name="post_id">
+                                        <button class="btn btn-primary" type="submit">応援する</button>
+                                    </form>
+@*                                    <span th:if="${loginMemberId == post.member.getMember_id()}" th:text="${post.reactions.size()}">*@
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="right-sidebar-header">
+                        <!-- Search form -->
+                    <form action="" method="get" id="search_form">
+                        <input id="search_box" class="form-control" name="search_tag" type="text" placeholder="Search" aria-label="Search">
+                    </form>
+                </div>
+                <nav id="sidebar" class="sidebar-right">
+                    <div class="right-sidebar-wrapper">
+                        <p class="right-sidebar-wrapper-each-items">人気の＃タグ</p>
+                        <ul class="list-unstyled components" each="tag : ${popularTags}">
+                            <li class="active">
+                                <form action="" method="get" id="tag-search_form">
+                                    <input type="hidden" id="search_box" class="form-control" name="search_tag" type="text" placeholder="Search" aria-label="Search" value="">
+                                </form>
+                                <a href="#"><span id="content_tag" class="content_tag" text="${tag.getName()}"></span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="right-sidebar-wrapper">
+                        <p class="right-sidebar-wrapper-each-items">カテゴリ</p>
+                        <ul class="list-unstyled components">
+                            <form action="#" method="get" id="category-search_form">
+                                <div class="form-check" each="category : ${categories}">
+                                    <input type="radio" class="form-check-input" id="materialUnchecked" name="categoryId" value="${category.getCategory_id()}">
+                                    <label class="form-check-label" for="materialUnchecked" text="${category.getName()}"></label>
+                                </div>
+                            </form>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </body>
 }

@@ -9,8 +9,8 @@ import org.mindrot.jbcrypt.BCrypt
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import service.auth.models.SignUpForm
 import slick.jdbc.JdbcProfile
-import tables.Tables.{AuthUser, _}
 import slick.jdbc.MySQLProfile.api._
+import tables.Tables.{AuthUser, _}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -19,7 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 // e.g. バリデーションなど
 class AuthUserService @Inject()(
                                  val dbConfigProvider: DatabaseConfigProvider
-                               )(implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile]{
+                               )(implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   def findByEmail(email: String): Future[Option[AuthUserRow]] = {
     // すでに存在するかどうかを確認
@@ -33,10 +33,10 @@ class AuthUserService @Inject()(
 
   def createAuthUser(data: SignUpForm, uuid: String): Future[Unit] = {
     val user = AuthUserRow(0, data.email, doHashPassword(data.password), getNowTimeStamp)
-    val action =  (
+    val action = (
       for {
         authUserId: Int <- AuthUser returning AuthUser.map(_.authUserId) += user
-        _ <- Member += MemberRow(0,  data.nickname, uuid, authUserId, getNowTimeStamp, getNowTimeStamp)
+        _ <- Member += MemberRow(0, data.nickname, uuid, authUserId, getNowTimeStamp, getNowTimeStamp)
       } yield ()).transactionally
     // returningで、戻り値を指定できる
     // createしたauthUserのIDを指定ている
@@ -49,8 +49,12 @@ class AuthUserService @Inject()(
 
   def loginValidate(email: String, password: String): Future[Boolean] = {
     this.findByEmail(email) flatMap {
-      case Some(authUser) => Future { checkPassword(password) }
-      case None => Future { false }
+      case Some(authUser) => Future {
+        checkPassword(password)
+      }
+      case None => Future {
+        false
+      }
     }
   }
 

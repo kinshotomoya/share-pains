@@ -1,0 +1,16 @@
+#post_form {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.error {
+    border-color: red;
+}
+
+.error-message {
+    color: red;
+}
+
+.disabled {
+    display: none;
+}

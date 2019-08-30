@@ -1,8 +1,11 @@
 @(message: String)(implicit request: Request[Any])
 @import helper._
 @main("post") {
+    <head>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/post.css")">
+    </head>
     <body id="create_post_page">
-        <div>
+        <div id="post_form">
             @form(routes.PostController.post()) {
                 @CSRF.formField
                 <p class="h4 mb-4">投稿</p>
