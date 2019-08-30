@@ -1,4 +1,6 @@
-@()
+@(posts: Seq[tables.Tables.PostRow])(implicit request: Request[Any])
+
+@import helper._
 
 @main("Welcome to Play") {
   <h1>Welcome to Play!</h1>
