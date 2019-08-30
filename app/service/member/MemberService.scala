@@ -20,7 +20,25 @@ class MemberService @Inject()(
 
   // TODO: ほんまはUUIDを更新しないけど、joinの練習と、代替案が思い浮かばなかったからしゃーなし。。。
   def findUUIDByAuthUserEmailAndUpdateUUID(email: String, uuid: String): Unit = {
+
     // DB.runを二回するには、いいのか？？
+    // SQL
+    // update member
+    //   set member.uuid = "rrrrrrrrrrrrrrr"
+    // where member.member_id
+    // in
+    //   (select tmp.member_id
+    //      from (select member.member_id
+    //              from member inner
+    //              join auth_user
+    //                  on member.auth_user_id = auth_user.auth_user_id
+    //              where auth_user.email = "aaa@gmail.com"
+    //            )
+    //       as tmp
+    //   );
+
+    // 上記のクエリをslickで実現したい
+
     db.run(AuthUser.filter(_.email === email).result.headOption).map {
       authUser => {
         val value = Member.filter(_.authUserId === authUser.get.authUserId).map(_.uuid)
