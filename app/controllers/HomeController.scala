@@ -4,17 +4,17 @@ import javax.inject._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.mvc._
 import slick.jdbc.JdbcProfile
-import tables.Tables._
 import slick.jdbc.MySQLProfile.api._
+import tables.Tables._
 
 import scala.concurrent.ExecutionContext
 
 /**
- * This controller creates an `Action` to handle HTTP requests to the
- * application's home page.
- */
+  * This controller creates an `Action` to handle HTTP requests to the
+  * application's home page.
+  */
 @Singleton
-class HomeController @Inject() (val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController {
+class HomeController @Inject()(val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController {
 
   def index = Action.async { implicit request =>
     // .resultでDBIOAction型に変換している

@@ -6,12 +6,12 @@ import play.api.data.Form
 import play.api.data.Forms.{mapping, nonEmptyText}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.mvc._
-import slick.jdbc.JdbcProfile
 import service.post.{PostForm, PostService}
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext
 
-class PostController @Inject() (postService: PostService) (val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController{
+class PostController @Inject()(postService: PostService)(val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController {
 
   val postForm = Form(
     mapping(
@@ -22,7 +22,7 @@ class PostController @Inject() (postService: PostService) (val dbConfigProvider:
   def renderPostPage = Action { implicit req =>
     req.session.get("userInfo") match {
       case Some(uuid) => Ok(views.html.post(""))
-      case None =>  Redirect(routes.LoginController.renderLoginPage())
+      case None => Redirect(routes.LoginController.renderLoginPage())
     }
   }
 
