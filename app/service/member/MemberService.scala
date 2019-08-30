@@ -20,16 +20,13 @@ class MemberService @Inject()(
 
   // TODO: ほんまはUUIDを更新しないけど、joinの練習と、代替案が思い浮かばなかったからしゃーなし。。。
   def findUUIDByAuthUserEmailAndUpdateUUID(email: String, uuid: String): Unit = {
-
-    val query = for {
-      authUser: AuthUser <- AuthUser.filter (_.email === email)
-      currentMember <- Member.filter(_.authUserId === authUser.authUserId)
-      updateMember = currentMember.result.map(_.copy(uuid = uuid))
-      result <- Member.insertOrUpdate(updateMember).transactionally
-    } yield result
-
-    db.run(query)
-
+    // DB.runを二回するには、いいのか？？
+    db.run(AuthUser.filter(_.email === email).result.headOption).map {
+      authUser => {
+        val value = Member.filter(_.authUserId === authUser.get.authUserId).map(_.uuid)
+        db.run(value.update(uuid))
+      }
+    }
   }
 
   private def getNowTimeStamp: Timestamp = {
@@ -37,8 +34,6 @@ class MemberService @Inject()(
     val timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     java.sql.Timestamp.valueOf(timeFormat.format(today))
   }
-
-//    val action = query.update(uuid).transactionally
 
 
     // SQL
