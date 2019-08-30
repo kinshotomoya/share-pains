@@ -5,14 +5,13 @@ import play.api.data.Form
 import play.api.data.Forms.{mapping, nonEmptyText, _}
 import play.api.mvc.{Action, Controller}
 import service.auth.AuthUserService
+import service.auth.models.LoginForm
 import service.member.MemberService
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class LoginController @Inject()(authUserService: AuthUserService, memberService: MemberService)(implicit ec: ExecutionContext) extends Controller with BaseController {
-
-  import LoginController._
 
   val loginForm = Form(
     mapping(
@@ -46,7 +45,7 @@ class LoginController @Inject()(authUserService: AuthUserService, memberService:
         authUserService.loginValidate(data.email, data.password) map {
           case true => {
             // emailからauthuserに紐づいているmemberのuuidを取得する
-            //            val futureUUID: Future[String] = memberService.findUUIDByAuthUserEmail(data.email)
+            // val futureUUID: Future[String] = memberService.findUUIDByAuthUserEmail(data.email)
             val uuid = authUserService.createUuid
             memberService.findUUIDByAuthUserEmailAndUpdateUUID(data.email, uuid)
             Redirect(routes.HomeController.index()).withSession("userInfo" -> uuid)
@@ -61,11 +60,4 @@ class LoginController @Inject()(authUserService: AuthUserService, memberService:
     req.session.-("userInfo")
     Redirect(routes.LoginController.renderLoginPage())
   }
-}
-
-// TODO: 特にコンパニオンオブジェクトにする必要はないので、case classを他のファイルに切り出す
-object LoginController {
-
-  case class LoginForm(email: String, password: String)
-
 }
