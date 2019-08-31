@@ -8,6 +8,7 @@ import javax.inject.Inject
 import org.mindrot.jbcrypt.BCrypt
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import service.auth.models.SignUpForm
+import service.common.Common
 import slick.jdbc.JdbcProfile
 import slick.jdbc.MySQLProfile.api._
 import tables.Tables.{AuthUser, _}
@@ -19,12 +20,12 @@ import scala.concurrent.{ExecutionContext, Future}
 // e.g. バリデーションなど
 class AuthUserService @Inject()(
                                  val dbConfigProvider: DatabaseConfigProvider
-                               )(implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
+                               )(implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] with Common{
 
   def findByEmail(email: String): Future[Option[AuthUserRow]] = {
     // すでに存在するかどうかを確認
     // db.run()でFuture[R]が返ってくる
-    // 型の定義が曖昧なので、明示的に型を記述している
+    // 型の定義が曖昧（自分の理解）なので、明示的に型を記述している
     val query = AuthUser.filter(_.email === email.bind)
     val action: DBIO[Option[AuthUserRow]] = query.result.headOption
     val result: Future[Option[AuthUserRow]] = db.run(action)
@@ -49,12 +50,8 @@ class AuthUserService @Inject()(
 
   def loginValidate(email: String, password: String): Future[Boolean] = {
     this.findByEmail(email) flatMap {
-      case Some(authUser) => Future {
-        checkPassword(password)
-      }
-      case None => Future {
-        false
-      }
+      case Some(authUser) => checkPassword(password).future
+      case None => false.future
     }
   }
 

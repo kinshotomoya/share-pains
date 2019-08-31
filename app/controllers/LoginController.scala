@@ -6,12 +6,13 @@ import play.api.data.Forms.{mapping, nonEmptyText, _}
 import play.api.mvc.{Action, Controller}
 import service.auth.AuthUserService
 import service.auth.models.LoginForm
+import service.common.Common
 import service.member.MemberService
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class LoginController @Inject()(authUserService: AuthUserService, memberService: MemberService)(implicit ec: ExecutionContext) extends Controller with BaseController {
+class LoginController @Inject()(authUserService: AuthUserService, memberService: MemberService)(implicit ec: ExecutionContext) extends Controller with BaseController with Common {
 
   val loginForm = Form(
     mapping(

@@ -6,6 +6,7 @@ import java.util.{Calendar, Date}
 
 import javax.inject.Inject
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import service.common.Common
 import service.post.models.{DisplayPostContent, PostForm}
 import slick.jdbc.JdbcProfile
 import slick.jdbc.MySQLProfile.api._
@@ -15,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PostService @Inject()(
                              val dbConfigProvider: DatabaseConfigProvider
-                           )(implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
+                           )(implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] with Common{
 
 
   def create(data: PostForm, uuid: String): Future[Boolean] = {
@@ -23,13 +24,9 @@ class PostService @Inject()(
       case Some(member) => {
         println(member.memberId)
         db.run(Post += PostRow(0L, data.content, getNowTimeStamp, member.memberId))
-        Future {
-          true
-        }
+        true.future
       }
-      case None => Future {
-        false
-      }
+      case None => false.future
     }
   }
 

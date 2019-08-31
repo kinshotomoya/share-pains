@@ -20,6 +20,7 @@ class MemberService @Inject()(
   // TODO: ほんまはUUIDを更新しないけど、joinの練習と、代替案が思い浮かばなかったからしゃーなし。。。
   def findUUIDByAuthUserEmailAndUpdateUUID(email: String, uuid: String): Unit = {
 
+    // TODO:
     // DB.runを二回するには、いいのか？？
     // SQL
     // update member

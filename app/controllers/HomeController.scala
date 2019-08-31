@@ -17,6 +17,7 @@ class HomeController @Inject()(val dbConfigProvider: DatabaseConfigProvider, val
 
   def index = Action.async { implicit request =>
     // .resultでDBIOAction型に変換している
+    // TODO: db.runなどのロジック含む処理を、service層に切り分ける
     db.run(Post.sortBy(_.createdAt.desc).join(Member).on(_.memberId === _.memberId).result).map { posts =>
       val contents = postService.tupleDisplayContent(posts)
       Ok(views.html.index(contents))

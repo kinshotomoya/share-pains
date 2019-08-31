@@ -8,6 +8,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc._
 import service.auth.AuthUserService
 import service.auth.models.SignUpForm
+import service.common.Common
 import slick.jdbc.JdbcProfile
 
 // slickの文法にするimplicitメソッドなどを定義している
@@ -18,7 +19,7 @@ import scala.concurrent.ExecutionContext
 class SignupController @Inject()(val messagesApi: MessagesApi,
                                  val authService: AuthUserService
                                 )(implicit ec: ExecutionContext)
-  extends Controller with BaseController {
+  extends Controller with BaseController with Common{
 
   val signUpForm = Form(
     mapping(
