@@ -1,0 +1,4 @@
+cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+# 同じclusterを構成するホスト名（今回はcontainer名）を指定する。指定したものがおなじcluster内で構成される。
+discovery.zen.ping.unicast.hosts: elasticsearch01,elasticsearch02,elasticsearch03

@@ -23,6 +23,13 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "org.mindrot" % "jbcrypt" % "0.4"
 
+val elastic4sVersion = "6.5.1"
+libraryDependencies ++= Seq(
+  "com.sksamuel.elastic4s" %% "elastic4s-core" % elastic4sVersion,
+  "com.sksamuel.elastic4s" %% "elastic4s-http" % elastic4sVersion,
+  "com.sksamuel.elastic4s" %% "elastic4s-http-streams" % elastic4sVersion
+)
+
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
 
