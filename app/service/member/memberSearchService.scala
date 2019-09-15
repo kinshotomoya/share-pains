@@ -11,20 +11,20 @@ object memberSearchService {
     import com.sksamuel.elastic4s.http.ElasticDsl._
 
     // indexを作る
-//    client.execute{
-//      createIndex("artists").mappings(
-//        mapping("modern").fields(
-//          textField("name")
-//        )
-//      )
-//    }.await
+    client.execute{
+      createIndex("artists").mappings(
+        mapping("modern").fields(
+          textField("name")
+        )
+      )
+    }.await
 
     // indexにデータを追加
-//    client.execute{
-//      // artist = index(database)
-//      // modern = type(table)
-//      indexInto("artists" / "modern").fields("name" -> "kinsho tomoya").refresh(RefreshPolicy.Immediate)
-//    }.await
+    client.execute{
+      // artist = index(database)
+      // modern = type(table)
+      indexInto("artists" / "modern").fields("name" -> "kinsho tomoya").refresh(RefreshPolicy.Immediate)
+    }.await
 
     // 検索を行う
     val resp = client.execute {
@@ -32,6 +32,9 @@ object memberSearchService {
     }.await
 
     // update_by_query
+    // queryで対象を絞り込む
+    // 今回の場合は、filed = name, value = tomoyaを更新対象のドキュメントにしている
+    // scriptで、実際に更新したい値を設定
     client.execute{
       updateByQuery("artists", "modern", matchQuery("name", "tomoya")).script("ctx._source.name = 'kinsho mimi'")
     }
