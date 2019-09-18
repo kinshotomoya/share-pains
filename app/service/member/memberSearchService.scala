@@ -95,7 +95,7 @@ object memberSearchService {
     }
 
     def createScript: Script = {
-      Script("ctx._source.price += params.price_raise").lang("painless").param("price_raise", 1000)
+      Script("ctx._source.price = params.update_name").lang("painless").param("update_name", "kinsho tomoya")
     }
 
   }
