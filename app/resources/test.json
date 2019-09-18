@@ -1,0 +1,14 @@
+{
+  "query": {
+    "match": {
+      "name": "tomoya"
+    }
+  },
+  "script": {
+    "lang": "painless",
+    "source": "ctx._source.name = params.update_name",
+    "params": {
+      "update_name": "kinsho smile tomoya"
+    }
+  }
+}
