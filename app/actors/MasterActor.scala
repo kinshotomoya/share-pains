@@ -1,5 +1,6 @@
 package actors
 
+import actors.MasterActor.{EvenNum, OddNum}
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.routing.FromConfig
 import play.api.Logger
@@ -9,12 +10,15 @@ import play.api.Logger
 // TODO: メモリリーク関連の理由だが、よくわからないので、再度調べる
 // https://akka-ja-2411-translated.netlify.com/scala/actors.html
 
-// あと、このactorが受け取るmessageの肩をコンパニオンオブジェクトの中に宣言していると、
-// どんなmessageを受け取るのかわかりやすいので、推奨
-
 object MasterActor {
 
   def props: Props = Props(new MasterActor)
+
+  // あと、このactorが受け取るmessageの肩をコンパニオンオブジェクトの中に宣言していると、
+  // どんなmessageを受け取るのかわかりやすいので、推奨
+  sealed trait ResultNumCase
+  case class OddNum(number: Int, message: String) extends ResultNumCase
+  case class EvenNum(number: Int, message: String) extends ResultNumCase
 }
 
 class MasterActor extends Actor with ActorLogging{
@@ -27,12 +31,16 @@ class MasterActor extends Actor with ActorLogging{
   val worker = context.actorOf(FromConfig.props(WorkerActor.props), "WorkerActor")
 
   override def receive: Receive = {
-    case msg:String => {
-//      print("------------------------")
-//      print(msg)
-//      print("------------------------")
+    case OddNum(num, message) => {
       // worker actorにmessageを送信！
-      worker ! msg
+      worker ! WorkerActor.NewOddNum(num*1000, message)
+    }
+    case EvenNum(num, message) => {
+      worker ! WorkerActor.NewEvenNum(num, message)
+    }
+    case _ => {
+      // ここがくるハズがない
+      print("error")
     }
   }
 }
