@@ -1,6 +1,8 @@
 package actors
 
 import akka.actor.{Actor, ActorLogging, Props}
+import akka.routing.FromConfig
+import play.api.Logger
 
 
 // NOTE: actorを作成するときは、コンパニオンオブジェクトの中で生成するのが推奨されている
@@ -17,11 +19,20 @@ object MasterActor {
 
 class MasterActor extends Actor with ActorLogging{
 
+  val logger = Logger(this.getClass)
+
+  // ルーター・ルーティ（worker actor）を作成
+  // 設定は、application.confに記載している
+  // 負荷分散するために、ルーティを作っている
+  val worker = context.actorOf(FromConfig.props(WorkerActor.props), "WorkerActor")
+
   override def receive: Receive = {
     case msg:String => {
-      print("------------------------")
-      print(msg)
-      print("------------------------")
+//      print("------------------------")
+//      print(msg)
+//      print("------------------------")
+      // worker actorにmessageを送信！
+      worker ! msg
     }
   }
 }

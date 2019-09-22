@@ -12,6 +12,10 @@ class EsUpdater @Inject()(
   def esUpdate = {
     val updater: ActorRef = actorSystem.actorOf(MasterActor.props, "MasterActor")
     // master actorにmessageを送る
-    updater ! "this is a message!!!!!!"
+    // きちんと、master -> router -> routee1, routee2　みたいに負荷分散されているか確認
+    for(i <- 0 to 10) {
+      updater ! "this is a message!!!!!!" + i
+      Thread.sleep(1000)
+    }
   }
 }
