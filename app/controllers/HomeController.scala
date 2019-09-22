@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.mvc._
+import service.EsUpdater
 import service.member.memberSearchService
 import service.post.PostService
 import slick.jdbc.JdbcProfile
@@ -14,7 +15,7 @@ import scala.concurrent.ExecutionContext
 
 
 @Singleton
-class HomeController @Inject()(val dbConfigProvider: DatabaseConfigProvider, val postService: PostService)(implicit val ec: ExecutionContext) extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController {
+class HomeController @Inject()(val dbConfigProvider: DatabaseConfigProvider, val postService: PostService, val esUpdater: EsUpdater)(implicit val ec: ExecutionContext) extends Controller with HasDatabaseConfigProvider[JdbcProfile] with BaseController {
 
   def index = Action.async { implicit request =>
     // .resultでDBIOAction型に変換している
@@ -34,6 +35,11 @@ class HomeController @Inject()(val dbConfigProvider: DatabaseConfigProvider, val
 
   def testElastic4s = Action { implicit request =>
     memberSearchService.searchMember
+    Redirect(routes.HomeController.index())
+  }
+
+  def testActor = Action { implicit request =>
+    esUpdater.esUpdate
     Redirect(routes.HomeController.index())
   }
 }

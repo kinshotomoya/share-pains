@@ -25,4 +25,6 @@ GET /post controllers.PostController.renderPostPage
 
 GET /es  controllers.HomeController.testElastic4s
 
+GET /actor controllers.HomeController.testActor
+
 #POST /reaction controllers.ReactionController.post
