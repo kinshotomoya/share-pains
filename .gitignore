@@ -8,3 +8,5 @@ target
 /RUNNING_PID
 
 db/data/
+
+conf/elasticsearch/data/*
