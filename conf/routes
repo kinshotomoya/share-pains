@@ -27,4 +27,5 @@ GET /es  controllers.HomeController.testElastic4s
 
 GET /actor controllers.HomeController.testActor
 
+GET /circe controllers.HomeController.testCirce
 #POST /reaction controllers.ReactionController.post

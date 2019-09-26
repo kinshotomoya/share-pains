@@ -30,7 +30,13 @@ libraryDependencies ++= Seq(
   "com.sksamuel.elastic4s" %% "elastic4s-http-streams" % elastic4sVersion
 )
 
+val circeVersion = "0.11.1"
+
 libraryDependencies ++= Seq(
+  "io.circe"                     %% "circe-core"             % circeVersion,
+  "io.circe"                     %% "circe-generic"          % circeVersion,
+  "io.circe"                     %% "circe-parser"           % circeVersion,
+  "io.circe"                     %% "circe-java8"            % circeVersion,
   "com.typesafe.akka" %% "akka-actor" % "2.5.6"
 )
 

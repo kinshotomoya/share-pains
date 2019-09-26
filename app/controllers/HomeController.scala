@@ -10,6 +10,7 @@ import slick.jdbc.JdbcProfile
 import slick.jdbc.MySQLProfile.api._
 import tables.Tables._
 import service.post.models.DisplayPostContent
+import study.Circe
 
 import scala.concurrent.ExecutionContext
 
@@ -40,6 +41,15 @@ class HomeController @Inject()(val dbConfigProvider: DatabaseConfigProvider, val
 
   def testActor = Action { implicit request =>
     esUpdater.esUpdate
+    Redirect(routes.HomeController.index())
+  }
+
+  def testCirce = Action { implicit request =>
+    Circe.parseJson match {
+      case Right(json) => println(json)
+      case Left(error) => println(error)
+    }
+    Circe.encodeToJson
     Redirect(routes.HomeController.index())
   }
 }
